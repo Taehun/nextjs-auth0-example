@@ -1,36 +1,111 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Next.js Auth0 Example
+
+Next.js와 Auth0를 사용한 인증 예제 프로젝트입니다.
+
+## Tech Stack
+
+- **Next.js** 16.1.2
+- **React** 19.2.3
+- **@auth0/nextjs-auth0** 4.14.0
+- **Tailwind CSS** 4.1.18
+- **TypeScript** 5.9.3
 
 ## Getting Started
 
-First, run the development server:
+### 1. 패키지 설치
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. 환경 변수 설정
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+`.env.example`을 `.env.local`로 복사하고 값을 설정합니다:
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+```bash
+cp .env.example .env.local
+```
+
+```env
+AUTH0_SECRET='use [openssl rand -hex 32] to generate a 32 bytes value'
+APP_BASE_URL='http://localhost:3000'
+AUTH0_DOMAIN='your-tenant.auth0.com'
+AUTH0_CLIENT_ID='your-client-id'
+AUTH0_CLIENT_SECRET='your-client-secret'
+```
+
+### 3. Auth0 Dashboard 설정
+
+[Auth0 Dashboard](https://manage.auth0.com)에서 Application 설정:
+
+- **Allowed Callback URLs:** `http://localhost:3000/auth/callback`
+- **Allowed Logout URLs:** `http://localhost:3000`
+
+### 4. 개발 서버 실행
+
+```bash
+pnpm dev
+```
+
+[http://localhost:3000](http://localhost:3000)에서 확인할 수 있습니다.
+
+## Project Structure
+
+```
+├── app/
+│   ├── dashboard/
+│   │   └── page.tsx      # 로그인 필요한 대시보드 페이지
+│   ├── globals.css       # Tailwind CSS 스타일
+│   ├── layout.tsx        # Auth0Provider 래퍼
+│   └── page.tsx          # 홈 페이지
+├── lib/
+│   └── auth0.ts          # Auth0Client 인스턴스
+├── middleware.ts         # Auth0 미들웨어 & 라우트 보호
+└── .env.local            # 환경 변수
+```
+
+## Auth Routes
+
+Auth0 SDK v4에서는 미들웨어가 인증 라우트를 자동으로 처리합니다:
+
+| Route | Description |
+|-------|-------------|
+| `/auth/login` | 로그인 |
+| `/auth/logout` | 로그아웃 |
+| `/auth/callback` | Auth0 콜백 |
+| `/auth/profile` | 사용자 프로필 (JSON) |
 
 ## Learn More
 
-To learn more about Next.js, take a look at the following resources:
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Auth0 Next.js SDK v4](https://github.com/auth0/nextjs-auth0)
+- [Tailwind CSS v4](https://tailwindcss.com/docs)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## Changelog
 
-## Deploy on Vercel
+### Updated 2026-01-15
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+**Major Version Upgrades:**
+- Next.js 14.1.0 → 16.1.2
+- React 18.3.1 → 19.2.3
+- @auth0/nextjs-auth0 3.8.0 → 4.14.0
+- Tailwind CSS 3.4.19 → 4.1.18
+- ESLint 8.57.1 → 9.39.2
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+**@auth0/nextjs-auth0 v4 Migration:**
+- 환경 변수 변경:
+  - `AUTH0_BASE_URL` → `APP_BASE_URL`
+  - `AUTH0_ISSUER_BASE_URL` → `AUTH0_DOMAIN` (scheme 제거)
+- 인증 경로 변경: `/api/auth/*` → `/auth/*`
+- `UserProvider` → `Auth0Provider`
+- `getSession()` → `auth0.getSession()` (Auth0Client 인스턴스에서 호출)
+- Route Handler 삭제 (미들웨어가 자동 처리)
+- Auth0 Dashboard의 Callback URL 업데이트 필요
+
+**Tailwind CSS v4 Migration:**
+- `@tailwindcss/postcss` 패키지 추가
+- PostCSS 설정 변경: `tailwindcss: {}` → `"@tailwindcss/postcss": {}`
+- CSS import 변경: `@tailwind base/components/utilities` → `@import "tailwindcss"`
+- `autoprefixer` 제거 (v4에 내장)
