@@ -1,4 +1,4 @@
-import { UserProvider } from '@auth0/nextjs-auth0/client';
+import { Auth0Provider } from "@auth0/nextjs-auth0";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -17,9 +17,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <UserProvider>
+      <Auth0Provider>
         <body className={inter.className}>{children}</body>
-      </UserProvider>
+      </Auth0Provider>
     </html>
   );
 }
